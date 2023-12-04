@@ -1,22 +1,8 @@
 import { ChangeEvent, useState } from "react";
 import { menuItems } from "../config/apis/MenuItems";
 import { generateMultipartAPI } from "../config/ApiGenerate";
-import axios from "axios";
+
 import React from "react";
-interface Name {
-    en: string;
-    ar: string;
-}
-
-interface Variant {
-    name: Name;
-    price: number;
-}
-
-interface Customization {
-    name: Name;
-    variants: Variant[];
-}
 
 export default function AddItems() {
     const [formData, setFormData] = useState({
@@ -47,7 +33,6 @@ export default function AddItems() {
             setSelectedFile(e.target.files[0]);
         }
     };
-    // const [customizations, setCustomizations] = useState<Customization[]>([]);
 
     const handleAddCustomization = () => {
         const newCustomization = {
@@ -322,26 +307,6 @@ export default function AddItems() {
                         ))}
                     </React.Fragment>
                 ))}
-                {/* <tr>
-                    <td><label>Customization Name English</label></td>
-                    <td><input type="text" name="customization_name_en" value={formData.customization_name_en} onChange={handleInputChange} /></td>
-                </tr>
-                <tr>
-                    <td><label>Customization Name Arabic</label></td>
-                    <td><input type="text" name="customization_name_ar" value={formData.customization_name_ar} onChange={handleInputChange} /></td>
-                </tr>
-                <tr>
-                    <td><label>Variant Name English</label></td>
-                    <td><input type="text" name="variant_name_en" value={formData.variant_name_en} onChange={handleInputChange} /></td>
-                </tr>
-                <tr>
-                    <td><label>Variant Name Arabic</label></td>
-                    <td><input type="text" name="variant_name_ar" value={formData.variant_name_ar} onChange={handleInputChange} /></td>
-                </tr>
-                <tr>
-                    <td><label>Variant Price</label></td>
-                    <td><input type="number" name="variant_price" value={formData.variant_price} onChange={handleInputChange} /></td>
-                </tr> */}
                 <tr>
                     <td></td>
                     <td>
