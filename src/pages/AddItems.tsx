@@ -20,16 +20,17 @@ interface Customization {
 
 export default function AddItems() {
     const [formData, setFormData] = useState({
-        name_en: '',
-        name_ar: '',
-        description_en: '',
-        description_ar: '',
-        price: '',
-        customization_name_en: '',
-        customization_name_ar: '',
-        variant_name_en: '',
-        variant_name_ar: '',
-        variant_price: '',
+        name_en: "",
+        name_ar: "",
+        description_en: "",
+        description_ar: "",
+        price: "",
+        customizations: [
+            {
+                name: { en: "", ar: "" },
+                variants: [{ name: { en: "", ar: "" }, price: "" }],
+            },
+        ],
     });
 
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -42,68 +43,117 @@ export default function AddItems() {
         }));
     };
     const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
-
         if (e.target.files && e.target.files.length > 0) {
             setSelectedFile(e.target.files[0]);
         }
     };
-    const [customizations, setCustomizations] = useState<Customization[]>([]);
+    // const [customizations, setCustomizations] = useState<Customization[]>([]);
 
     const handleAddCustomization = () => {
-        const newCustomization: Customization = {
+        const newCustomization = {
             name: { en: "", ar: "" },
-            variants: [{ name: { en: "", ar: "" }, price: 0 }],
+            variants: [{ name: { en: "", ar: "" }, price: "" }],
         };
 
-        setCustomizations([...customizations, newCustomization]);
+        setFormData((prevState) => ({
+            ...prevState,
+            customizations: [...prevState.customizations, newCustomization],
+        }));
+    };
+
+    const handleCustomizationInputChange = (customizationIndex: number, field: string, value: string) => {
+        setFormData((prevData) => {
+            const updatedCustomizations = [...prevData.customizations];
+            (updatedCustomizations[customizationIndex] as any)['name'][field] = value;
+            console.log('updatedCustomization', updatedCustomizations)
+            return {
+                ...prevData,
+                customizations: updatedCustomizations,
+            };
+        });
+    };
+
+    const handleVariantInputChange = (customizationIndex: number, variantIndex: number, field: string, value: string) => {
+        setFormData((prevData) => {
+            const updatedCustomizations = [...prevData.customizations];
+            (updatedCustomizations[customizationIndex].variants[variantIndex] as any)['name'][field] = value;
+            return {
+                ...prevData,
+                customizations: updatedCustomizations,
+            };
+        });
+    };
+    const handleVariantPriceChange = (customizationIndex: number, variantIndex: number, value: string) => {
+        setFormData((prevData) => {
+            const updatedCustomizations = [...prevData.customizations];
+            (updatedCustomizations[customizationIndex].variants[variantIndex] as any)['price'] = value;
+            return {
+                ...prevData,
+                customizations: updatedCustomizations,
+            };
+        });
     };
     const handleRemoveCustomization = (index: number) => {
-        const updatedCustomizations = [...customizations];
+        const updatedCustomizations = [...formData.customizations];
         updatedCustomizations.splice(index, 1);
-        setCustomizations(updatedCustomizations);
+
+        setFormData((prevState) => ({
+            ...prevState,
+            customizations: updatedCustomizations,
+        }));
     };
 
     const handleAddItem = async () => {
-        const price = parseFloat(formData.price);
-        const variantPrice = parseFloat(formData.variant_price);
-
-        // Validation
-        if (Object.values(formData).some((field) => !field) ||
-            isNaN(price) ||
-            price < 0 ||
-            isNaN(variantPrice) ||
-            variantPrice < 0) {
-            alert('Please fill in all fields and ensure that the price is not negative.');
+        // Perform validation
+        if (
+            !formData.name_en ||
+            !formData.name_ar ||
+            !formData.description_en ||
+            !formData.description_ar ||
+            !formData.price ||
+            formData.customizations.some((customization) => !customization.name.en || !customization.name.ar)
+        ) {
+            alert("Please fill in all required fields.");
             return;
         }
+
+        // Validation for variant prices or any other specific validation can be added here
+
+        // If all validation passes, proceed with the API call
         const addItemApi = menuItems.addMenuItem;
-        // Create a FormData object
         const formDataToSend = new FormData();
 
-        formDataToSend.append('name_en', formData.name_en);
-        formDataToSend.append('name_ar', formData.name_ar);
-        formDataToSend.append('description_en', formData.description_en);
-        formDataToSend.append('description_ar', formData.description_ar);
-        formDataToSend.append('price', formData.price);
-        formDataToSend.append('customization_name_en', formData.customization_name_en);
-        formDataToSend.append('customization_name_ar', formData.customization_name_ar);
-        formDataToSend.append('variant_name_en', formData.variant_name_en);
-        formDataToSend.append('variant_name_ar', formData.variant_name_ar);
-        formDataToSend.append('variant_price', formData.variant_price);
+        // Append form data to FormData object
+        formDataToSend.append("name_en", formData.name_en);
+        formDataToSend.append("name_ar", formData.name_ar);
+        formDataToSend.append("description_en", formData.description_en);
+        formDataToSend.append("description_ar", formData.description_ar);
+        formDataToSend.append("price", formData.price);
 
-        // Append the image file to the FormData object
+        // Append image file if selected
         if (selectedFile) {
-            formDataToSend.append('image', selectedFile);
+            formDataToSend.append("image", selectedFile);
         }
 
-        addItemApi.data = formDataToSend;
-        // console.log('api', addItemApi)
+        // Append customizations to FormData object
+        formData.customizations.forEach((customization, index) => {
+            formDataToSend.append(`customization_name_en_${index}`, customization.name.en);
+            formDataToSend.append(`customization_name_ar_${index}`, customization.name.ar);
+
+            customization.variants.forEach((variant, variantIndex) => {
+                formDataToSend.append(`variant_name_en_${index}_${variantIndex}`, variant.name.en);
+                formDataToSend.append(`variant_name_ar_${index}_${variantIndex}`, variant.name.ar);
+                formDataToSend.append(`variant_price_${index}_${variantIndex}`, variant.price);
+            });
+        });
 
         try {
+            addItemApi.data = formDataToSend
             const response = await generateMultipartAPI(addItemApi);
-            // alert(response?.data.message)
+            alert(response?.data.message);
         } catch (ex) {
-            console.log(ex);
+            console.error(ex);
+            alert("An error occurred while adding the item.");
         }
     };
 
@@ -111,99 +161,166 @@ export default function AddItems() {
         <table>
             <tbody>
                 <tr>
-                    <td><label>Name English</label></td>
-                    <td><input type="text" name="name_en" value={formData.name_en} onChange={handleInputChange} /></td>
+                    <td>
+                        <label>Name English</label>
+                    </td>
+                    <td>
+                        <input
+                            type="text"
+                            name="name_en"
+                            value={formData.name_en}
+                            onChange={handleInputChange}
+                        />
+                    </td>
                 </tr>
                 <tr>
-                    <td><label>Name Arabic</label></td>
-                    <td><input type="text" name="name_ar" value={formData.name_ar} onChange={handleInputChange} /></td>
+                    <td>
+                        <label>Name Arabic</label>
+                    </td>
+                    <td>
+                        <input
+                            type="text"
+                            name="name_ar"
+                            value={formData.name_ar}
+                            onChange={handleInputChange}
+                        />
+                    </td>
                 </tr>
                 <tr>
-                    <td><label>Description English</label></td>
-                    <td><input type="text" name="description_en" value={formData.description_en} onChange={handleInputChange} /></td>
+                    <td>
+                        <label>Description English</label>
+                    </td>
+                    <td>
+                        <input
+                            type="text"
+                            name="description_en"
+                            value={formData.description_en}
+                            onChange={handleInputChange}
+                        />
+                    </td>
                 </tr>
                 <tr>
-                    <td><label>Description Arabic</label></td>
-                    <td><input type="text" name="description_ar" value={formData.description_ar} onChange={handleInputChange} /></td>
+                    <td>
+                        <label>Description Arabic</label>
+                    </td>
+                    <td>
+                        <input
+                            type="text"
+                            name="description_ar"
+                            value={formData.description_ar}
+                            onChange={handleInputChange}
+                        />
+                    </td>
                 </tr>
                 <tr>
-                    <td><label>Price</label></td>
-                    <td><input type="number" name="price" value={formData.price} onChange={handleInputChange} /></td>
+                    <td>
+                        <label>Price</label>
+                    </td>
+                    <td>
+                        <input
+                            type="number"
+                            name="price"
+                            value={formData.price}
+                            onChange={handleInputChange}
+                        />
+                    </td>
                 </tr>
                 <tr>
-                    <td><label>Image</label></td>
-                    <td><input type="file" name="image" onChange={handleImageChange} /></td>
+                    <td>
+                        <label>Image</label>
+                    </td>
+                    <td>
+                        <input type="file" name="image" onChange={handleImageChange} />
+                    </td>
                 </tr>
                 <tr>
-                    <button onClick={handleAddCustomization} className="btn-purple">Add Customization</button>
+                    <td>
+                        <button onClick={handleAddCustomization} className="btn-purple">
+                            Add Customization
+                        </button>
+                    </td>
                 </tr>
                 {/* Render customization input fields */}
-                {customizations.map((customization, index) => (
+                {formData.customizations.map((customization, index) => (
                     <React.Fragment key={`customizations_` + index}>
-                        <tr key={`customization_` + index}><td><h1>Customization{` ` + (index + 1)}</h1></td></tr>
-                        <tr key={`customization_name_en_` + index}>
-                            <td><label>Customization Name English</label></td>
-                            <td><input
-                                type="text"
-                                value={customization.name.en}
-                                onChange={(e) =>
-                                // handleInputChange(index, "name", "en", e.target.value)
-                                { }}
-                            />
+                        <tr key={`customization_` + index}>
+                            <td>
+                                <h1>Customization{` ` + (index + 1)}</h1>
                             </td>
-                            <td><button className="btn-red" onClick={() => handleRemoveCustomization(index)}>Remove Customization{` ` + (index + 1)}</button></td>
+                        </tr>
+                        <tr key={`customization_name_en_` + index}>
+                            <td>
+                                <label>Customization Name English</label>
+                            </td>
+                            <td>
+                                <input
+                                    type="text"
+                                    value={customization.name.en}
+                                    onChange={(e) => { handleCustomizationInputChange(index, 'en', e.target.value) }}
+                                />
+                            </td>
+                            <td>
+                                <button
+                                    className="btn-red"
+                                    onClick={() => handleRemoveCustomization(index)}
+                                >
+                                    Remove Customization{` ` + (index + 1)}
+                                </button>
+                            </td>
                         </tr>
                         <tr key={`customization_name_ar_` + index}>
-                            <td><label>Customization Name Arabic</label></td>
                             <td>
-                                <input type="text" value={customization.name.ar}
-                                    onChange={(e) => { }}
+                                <label>Customization Name Arabic</label>
+                            </td>
+                            <td>
+                                <input
+                                    type="text"
+                                    value={customization.name.ar}
+                                    onChange={(e) => { handleCustomizationInputChange(index, 'ar', e.target.value) }}
                                 />
                             </td>
                         </tr>
                         {customization.variants.map((variant, variantIndex) => (
                             <React.Fragment key={`variants_` + index}>
                                 <tr key={`variant_name_en_` + variantIndex}>
-                                    <td><label>Variant Name English</label></td>
-                                    <td><input
-                                        type="text"
-                                        value={variant.name.en}
-                                        onChange={(e) =>
-                                        // handleInputChange(
-                                        //     index,
-                                        //     "variants",
-                                        //     "en",
-                                        //     e.target.value
-                                        // )
-                                        { }}
-                                    /></td>
+                                    <td>
+                                        <label>Variant Name English</label>
+                                    </td>
+                                    <td>
+                                        <input
+                                            type="text"
+                                            value={variant.name.en}
+                                            onChange={(e) => { handleVariantInputChange(index, variantIndex, 'en', e.target.value) }}
+                                        />
+                                    </td>
                                 </tr>
                                 <tr key={`variant_name_ar_` + variantIndex}>
-                                    <td><label>Variant Name Arabic</label></td>
-                                    <td><input
-                                        type="text"
-                                        value={variant.name.ar}
-                                        onChange={(e) =>
-                                        // handleInputChange(
-                                        //     index,
-                                        //     "variants",
-                                        //     "en",
-                                        //     e.target.value
-                                        // )
-                                        { }}
-                                    /></td>
+                                    <td>
+                                        <label>Variant Name Arabic</label>
+                                    </td>
+                                    <td>
+                                        <input
+                                            type="text"
+                                            value={variant.name.ar}
+                                            onChange={(e) => { handleVariantInputChange(index, variantIndex, 'ar', e.target.value) }}
+                                        />
+                                    </td>
                                 </tr>
                                 <tr key={`variant_price_` + variantIndex}>
-                                    <td><label>Variant Price</label></td>
                                     <td>
-                                        <input type="number" name={`variant_price_` + { index }}
-                                            onChange={(e) => { }}
+                                        <label>Variant Price</label>
+                                    </td>
+                                    <td>
+                                        <input
+                                            type="number"
+                                            name={`variant_price_` + { index }}
+                                            onChange={(e) => { handleVariantPriceChange(index, variantIndex, e.target.value) }}
                                         />
                                     </td>
                                 </tr>
                             </React.Fragment>
                         ))}
-                    </React.Fragment >
+                    </React.Fragment>
                 ))}
                 {/* <tr>
                     <td><label>Customization Name English</label></td>
@@ -225,7 +342,14 @@ export default function AddItems() {
                     <td><label>Variant Price</label></td>
                     <td><input type="number" name="variant_price" value={formData.variant_price} onChange={handleInputChange} /></td>
                 </tr> */}
-                <tr><td></td><td><button className="btn btn-blue" onClick={handleAddItem}>Submit</button></td></tr>
+                <tr>
+                    <td></td>
+                    <td>
+                        <button className="btn btn-blue" onClick={handleAddItem}>
+                            Submit
+                        </button>
+                    </td>
+                </tr>
             </tbody>
         </table>
     );
