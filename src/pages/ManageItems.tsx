@@ -11,17 +11,40 @@ export default function ManageItems() {
     const tableItems: any = menuItems?.map((item: MenuItem, index: number) => {
         // const serializedItem = encodeURIComponent(JSON.stringify(item));
         return (
-            <tr key={index} className="row-item" onClick={() => navigate('/item-details', { state: item })}>
-                <td>{item.name?.en}</td>
-                <td>{item.description?.en}</td>
-                <td>{item.price}</td>
-                <td><img src={item.image} /></td>
+            <tr key={index} className="row-item" >
+                <td onClick={() => navigate('/item-details', { state: item })}>{item.name?.en}</td>
+                <td onClick={() => navigate('/item-details', { state: item })}>{item.description?.en}</td>
+                <td onClick={() => navigate('/item-details', { state: item })}>{item.price}</td>
+                <td onClick={() => navigate('/item-details', { state: item })}><img src={item.image} /></td>
                 <td><i className="fa fa-edit action-icon"></i></td>
-                <td><i className="fa fa-trash-o action-icon"></i></td>
+                <td>
+                    <i className="fa fa-trash-o action-icon" onClick={(e) => deleteItem(index, e)}></i>
+                </td>
             </tr>
 
         )
     })
+    const deleteItem = async (index: number, e: React.MouseEvent) => {
+        e.preventDefault();
+        try {
+            // Make an API call to delete the item by index
+            const deleteApi = menuItemsApi.deleteMenuItemByIndex;
+            const formData = new FormData()
+            // formData.append('index', index)
+            deleteApi.data = formData
+            await generateAPI(deleteApi);
+
+            // Update the state to reflect the deleted item
+            setMenuItems((prevItems) => {
+                const updatedItems = [...prevItems];
+                updatedItems.splice(index, 1);
+                return updatedItems;
+            });
+        } catch (error) {
+            // Handle error
+            console.log('Unable to delete menu item: ', error);
+        }
+    };
 
     useEffect(() => {
         async function fetchMenuItems() {

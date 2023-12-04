@@ -8,5 +8,10 @@ export const menuItems = {
       url: "/addItem",
       method: "POST",
       data: {}
+    },
+    deleteMenuItemByIndex: {
+      url: "/deleteItem",
+      method: "POST",
+      data: {}
     }
 }
