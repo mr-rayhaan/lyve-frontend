@@ -246,7 +246,7 @@ export default function AddItems() {
                             </td>
                             <td>
                                 <button
-                                    className="btn-red"
+                                    className="btn btn-red"
                                     onClick={() => handleRemoveCustomization(index)}
                                 >
                                     Remove Customization{` ` + (index + 1)}

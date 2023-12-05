@@ -7,6 +7,9 @@ import { useNavigate } from "react-router-dom";
 export default function ManageItems() {
     const [menuItems, setMenuItems] = useState<MenuItem[]>([])
     const navigate = useNavigate()
+    const [itemToDeleteIndex, setItemToDeleteIndex] = useState<number>(-1)
+    const [isDeleteConfirmationVisible, setDeleteConfirmationVisible] = useState<boolean>(false);
+
 
     const tableItems: any = menuItems?.map((item: MenuItem, index: number) => {
         // const serializedItem = encodeURIComponent(JSON.stringify(item));
@@ -18,19 +21,19 @@ export default function ManageItems() {
                 <td onClick={() => navigate('/item-details', { state: item })}><img src={item.image} /></td>
                 <td><i className="fa fa-edit action-icon"></i></td>
                 <td>
-                    <i className="fa fa-trash-o action-icon" onClick={(e) => deleteItem(index, e)}></i>
+                    <i className="fa fa-trash-o action-icon" onClick={() => toggleDeleteConfirmation(index, true)}></i>
                 </td>
             </tr>
 
         )
     })
-    const deleteItem = async (index: number, e: React.MouseEvent) => {
-        e.preventDefault();
+    const deleteItem = async (index: number) => {
+        // e.preventDefault();
         try {
             // Make an API call to delete the item by index
             const deleteApi = menuItemsApi.deleteMenuItemByIndex;
             const formData = new FormData()
-            // formData.append('index', index)
+            formData.append('index', index.toString())
             deleteApi.data = formData
             await generateAPI(deleteApi);
 
@@ -45,6 +48,16 @@ export default function ManageItems() {
             console.log('Unable to delete menu item: ', error);
         }
     };
+    const toggleDeleteConfirmation = (index: number, value: boolean) => {
+
+        setDeleteConfirmationVisible(value);
+        setItemToDeleteIndex(index)
+
+    };
+    const confirmDelete = () => {
+        deleteItem(itemToDeleteIndex)
+        toggleDeleteConfirmation(-1, false)
+    }
 
     useEffect(() => {
         async function fetchMenuItems() {
@@ -69,17 +82,30 @@ export default function ManageItems() {
         return <p>Loading</p>
     }
     return (
-        <table>
-            <tbody>
-                <tr>
-                    <td>Name</td>
-                    <td>Description</td>
-                    <td>Price</td>
-                    <td>Image</td>
-                    <td>Action</td>
-                </tr>
-                {tableItems}
-            </tbody>
-        </table>
+        <>
+            <table>
+                <tbody>
+                    <tr>
+                        <td>Name</td>
+                        <td>Description</td>
+                        <td>Price</td>
+                        <td>Image</td>
+                        <td>Action</td>
+                    </tr>
+                    {tableItems}
+                </tbody>
+            </table>
+            {isDeleteConfirmationVisible && (
+                <div>
+                    <div className="overlayStyles" onClick={() => toggleDeleteConfirmation(-1, false)}></div>
+                    <div className="dialogStyles">
+                        <p>Are you sure you want to delete this item?</p>
+                        <div className="h-4"></div>
+                        <button className="btn btn-red" onClick={confirmDelete}>Yes</button>
+                        <button className="btn btn-blue" onClick={() => toggleDeleteConfirmation(-1, false)}>No</button>
+                    </div>
+                </div>
+            )}
+        </>
     );
 } 
