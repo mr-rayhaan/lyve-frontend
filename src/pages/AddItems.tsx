@@ -50,7 +50,7 @@ export default function AddItems() {
         setFormData((prevData) => {
             const updatedCustomizations = [...prevData.customizations];
             (updatedCustomizations[customizationIndex] as any)['name'][field] = value;
-            console.log('updatedCustomization', updatedCustomizations)
+
             return {
                 ...prevData,
                 customizations: updatedCustomizations,
