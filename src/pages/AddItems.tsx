@@ -119,8 +119,6 @@ export default function AddItems() {
             return;
         }
 
-        // Validation for variant prices or any other specific validation can be added here
-
         // If all validation passes, proceed with the API call
         const addItemApi = menuItems.addMenuItem;
         const formDataToSend = new FormData();
