@@ -44,9 +44,10 @@ export default function ManageItems() {
                 updatedItems.splice(index, 1);
                 return updatedItems;
             });
+            alert('Item deleted')
         } catch (error) {
             // Handle error
-            console.log('Unable to delete menu item: ', error);
+            alert('Unable to delete menu item: ');
         }
     };
     const toggleDeleteConfirmation = (index: number, value: boolean) => {
