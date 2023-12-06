@@ -111,6 +111,7 @@ export default function AddItems() {
             !formData.name_ar ||
             !formData.description_en ||
             !formData.description_ar ||
+            !selectedFile ||
             !formData.price ||
             formData.customizations.some((customization) => !customization.name.en || !customization.name.ar)
         ) {
