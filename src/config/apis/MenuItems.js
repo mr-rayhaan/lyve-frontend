@@ -13,5 +13,15 @@ export const menuItems = {
       url: "/deleteItem",
       method: "POST",
       data: {}
+    },
+    getItemByIndex: {
+      url: "/getItemByIndex/",
+      method: "GET",
+      data: null
+    },
+    updateItem: {
+      url: '/updateItem',
+      method: "POST",
+      data: {}
     }
 }
