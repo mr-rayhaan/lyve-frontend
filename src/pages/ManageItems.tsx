@@ -20,7 +20,7 @@ export default function ManageItems() {
                 <td onClick={() => navigate('/item-details', { state: item })}>{item.description?.en}</td>
                 <td onClick={() => navigate('/item-details', { state: item })}>{item.price}</td>
                 <td onClick={() => navigate('/item-details', { state: item })}><img src={item.image} /></td>
-                <td><i className="fa fa-edit action-icon" onClick={() => navigate(`/edit-item/${index}`)}></i></td>
+                <td><i className="fa fa-edit action-icon" onClick={() => navigate(`/edit-item/${calculateAdjustedIndex(index)}`)}></i></td>
                 <td>
                     <i className="fa fa-trash-o action-icon" onClick={() => toggleDeleteConfirmation(index, true)}></i>
                 </td>
@@ -28,13 +28,16 @@ export default function ManageItems() {
 
         )
     })
+    function calculateAdjustedIndex(selectedIndex: number) {
+        return ((currentPage - 1) * itemsPerPage + selectedIndex).toString();
+    }
     const deleteItem = async (index: number) => {
         // e.preventDefault();
         try {
             // Make an API call to delete the item by index
             const deleteApi = menuItemsApi.deleteMenuItemByIndex;
             const formData = new FormData()
-            formData.append('index', index.toString())
+            formData.append('index', calculateAdjustedIndex(index))
             deleteApi.data = formData
             await generateAPI(deleteApi);
 
@@ -47,7 +50,7 @@ export default function ManageItems() {
             alert('Item deleted')
         } catch (error) {
             // Handle error
-            alert('Unable to delete menu item: ');
+            alert('Unable to delete menu item');
         }
     };
     const toggleDeleteConfirmation = (index: number, value: boolean) => {
