@@ -80,7 +80,6 @@ export default function EditItem() {
 
     const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files.length > 0) {
-            console.log(e.target.files[0])
             setSelectedFile(e.target.files[0]);
         }
     };
@@ -166,19 +165,19 @@ export default function EditItem() {
             if (selectedFile) {
                 formDataToSend.append("image", selectedFile);
             }
-
+            
             // Append customizations to FormData object
-            formData.customizations.forEach((customization, index) => {
-                formDataToSend.append(`customization_name_en_${index}`, customization.name.en);
-                formDataToSend.append(`customization_name_ar_${index}`, customization.name.ar);
+                formData.customizations.forEach((customization, index) => {
+                    formDataToSend.append(`customization_name_en_${index}`, customization.name.en);
+                    formDataToSend.append(`customization_name_ar_${index}`, customization.name.ar);
 
-                customization.variants.forEach((variant, variantIndex) => {
-                    formDataToSend.append(`variant_name_en_${index}_${variantIndex}`, variant.name.en);
-                    formDataToSend.append(`variant_name_ar_${index}_${variantIndex}`, variant.name.ar);
-                    formDataToSend.append(`variant_price_${index}_${variantIndex}`, variant.price);
+                    customization.variants.forEach((variant, variantIndex) => {
+                        formDataToSend.append(`variant_name_en_${index}_${variantIndex}`, variant.name.en);
+                        formDataToSend.append(`variant_name_ar_${index}_${variantIndex}`, variant.name.ar);
+                        formDataToSend.append(`variant_price_${index}_${variantIndex}`, variant.price);
+                    });
                 });
-            });
-
+            
 
             // Make the API call to update the item
             const api = { ...menuItemsApi.updateItem }; // Assuming you have an updateItem API endpoint
