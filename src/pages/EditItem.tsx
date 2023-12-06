@@ -3,7 +3,7 @@ import { menuItems as menuItemsApi } from "../config/apis/MenuItems";
 import { generateAPI, generateMultipartAPI } from "../config/ApiGenerate";
 
 import React from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 export default function EditItem() {
     const [formData, setFormData] = useState({
@@ -24,6 +24,7 @@ export default function EditItem() {
     const [previewUrl, setPreviewUrl] = useState<string>('')
 
     const { index } = useParams()
+    const navigate = useNavigate()
 
     useEffect(() => {
 
@@ -183,11 +184,11 @@ export default function EditItem() {
             const api = { ...menuItemsApi.updateItem }; // Assuming you have an updateItem API endpoint
             api.data = formDataToSend;
             const response = await generateMultipartAPI(api);
-
-            console.log('Item updated successfully:', response);
+            alert('Item updated')
+            navigate('/manage-items')
         } catch (error) {
             // Handle error
-            console.error('Error updating item:', error);
+            alert('Error updating item:');
         }
     };
 
