@@ -6,6 +6,7 @@ import AddItems from "./pages/AddItems";
 import ManageItems from "./pages/ManageItems";
 import Layout from "./components/Layout";
 import ItemDetails from "./pages/ItemDetails";
+import EditItem from "./pages/EditItem";
 
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
             element={<ManageItems />}
           />
           <Route path="/item-details" element={<ItemDetails />} />
+          <Route path="/edit-item/:index" element={<EditItem />} />
         </Route>
       </Routes>
       <Outlet />
