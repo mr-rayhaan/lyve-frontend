@@ -1,5 +1,3 @@
-import React, { useState } from "react";
-import logo from "./logo.svg";
 import "./App.css";
 import { BrowserRouter, Routes, Route, Link, Outlet } from "react-router-dom";
 import AddItems from "./pages/AddItems";

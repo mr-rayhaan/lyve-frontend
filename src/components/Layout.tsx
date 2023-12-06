@@ -3,7 +3,7 @@ import { Link, Outlet } from "react-router-dom";
 export default function Layout() {
     return (
         <div id="main" className="w-full flex ">
-            <aside id="sidebar" className="bg-gray-200 min-w-[200px] h-screen">
+            <aside id="sidebar" className="bg-gray-200 w-[200px] h-screen">
                 <ul>
                     <Link to="/">
                         <li>Add Items</li>
@@ -14,7 +14,7 @@ export default function Layout() {
                     </Link>
                 </ul>
             </aside>
-            <aside id="main-content">
+            <aside id="main-content" className="w-[calc(100%-200px)]">
                 <Outlet />
             </aside>
         </div>
