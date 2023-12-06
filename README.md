@@ -11,6 +11,7 @@ Installation
 Usage
 Folder Structure
 Technologies Used
+Troubleshoot
 
 ### Prerequisites
 
@@ -84,3 +85,8 @@ config: `Contains configuration files, including API definitions and generators.
 `react-router-dom`
 `TypeScript`
 `CSS (Tailwind CSS)`
+
+### Troubleshoot
+
+If there are any errors or if the data does not load. Simply reset the json file from the following link:
+`https://docs.google.com/document/d/1PIy2MaiyOQHUzRmy7LuMrAGWt0QKPfve20qurVza6uE/edit`
