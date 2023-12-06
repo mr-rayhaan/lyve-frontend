@@ -87,6 +87,22 @@ export default function AddItems() {
             customizations: updatedCustomizations,
         }));
     };
+    const resetForm = (): void => {
+        setFormData({
+            name_en: "",
+            name_ar: "",
+            description_en: "",
+            description_ar: "",
+            price: "",
+            customizations: [
+                {
+                    name: { en: "", ar: "" },
+                    variants: [{ name: { en: "", ar: "" }, price: "" }],
+                },
+            ],
+        });
+        setSelectedFile(null);
+    }
 
     const handleAddItem = async () => {
         // Perform validation
@@ -136,6 +152,8 @@ export default function AddItems() {
             addItemApi.data = formDataToSend
             const response = await generateMultipartAPI(addItemApi);
             alert(response?.data.message);
+            resetForm();
+
         } catch (ex) {
             console.error(ex);
             alert("An error occurred while adding the item.");
