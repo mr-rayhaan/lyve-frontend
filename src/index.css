@@ -94,3 +94,9 @@ input[type="number"] {
   background-color: rgba(0, 0, 0, 0.5);
   z-index: 999;
 }
+.pagination-list-item {
+  @apply cursor-pointer p-1 rounded text-lg inline-block;
+}
+.pagination-list-item:hover {
+  @apply bg-blue-100;
+}
