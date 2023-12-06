@@ -3,6 +3,7 @@ export const menuItems = {
       url: "/",
       method: "GET",
       data: null,
+      params: {}
     },
     addMenuItem: {
       url: "/addItem",
