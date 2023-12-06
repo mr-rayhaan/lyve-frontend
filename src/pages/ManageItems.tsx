@@ -9,10 +9,11 @@ export default function ManageItems() {
     const navigate = useNavigate()
     const [itemToDeleteIndex, setItemToDeleteIndex] = useState<number>(-1)
     const [isDeleteConfirmationVisible, setDeleteConfirmationVisible] = useState<boolean>(false);
-
+    const [currentPage, setCurrentPage] = useState<number>(1);
+    const [itemsPerPage, setItemsPerPage] = useState<number>(5); // Change as needed
+    const [totalItems, setTotalItems] = useState<number>(0);
 
     const tableItems: any = menuItems?.map((item: MenuItem, index: number) => {
-        // const serializedItem = encodeURIComponent(JSON.stringify(item));
         return (
             <tr key={index} className="row-item" >
                 <td onClick={() => navigate('/item-details', { state: item })}>{item.name?.en}</td>
@@ -64,9 +65,15 @@ export default function ManageItems() {
 
             try {
                 const api = menuItemsApi.getAllMenuItems
+                api.params = {
+                    page: currentPage,
+                    limit: itemsPerPage,
+                };
                 var response: any = await generateAPI(api)
 
-                setMenuItems(() => response.data);
+                // setMenuItems(() => response.data);
+                setMenuItems(response.data.data);
+                setTotalItems(response.data.totalItems);
 
             } catch (error) {
                 // Handle error
@@ -75,7 +82,27 @@ export default function ManageItems() {
         }
 
         fetchMenuItems();
-    }, []);
+    }, [currentPage]);
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = menuItems.slice(indexOfFirstItem, indexOfLastItem);
+    // Add pagination component (e.g., page numbers or next/prev buttons)
+    const renderPagination = () => {
+        const pageNumbers = []; console.log(totalItems, "::", itemsPerPage)
+        for (let i = 1; i <= Math.ceil(totalItems / itemsPerPage); i++) {
+
+            pageNumbers.push(
+                <li key={i} onClick={() => setCurrentPage(i)} className={`pagination-list-item ` + `pagination-list-item ${currentPage === i ? 'font-bold' : ''}`}>
+                    {i}
+                </li>
+            );
+        }
+
+        return (
+            <ul style={{ display: 'inline-block', listStyle: 'none', padding: 0 }}>
+                {pageNumbers}
+            </ul>);
+    };
 
 
     if (!menuItems) {
@@ -93,8 +120,12 @@ export default function ManageItems() {
                         <td>Action</td>
                     </tr>
                     {tableItems}
+
                 </tbody>
             </table>
+            <div className="text-center mt-[20px]">
+                {renderPagination()}
+            </div>
             {isDeleteConfirmationVisible && (
                 <div>
                     <div className="overlayStyles" onClick={() => toggleDeleteConfirmation(-1, false)}></div>
