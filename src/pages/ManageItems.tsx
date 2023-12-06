@@ -19,7 +19,7 @@ export default function ManageItems() {
                 <td onClick={() => navigate('/item-details', { state: item })}>{item.description?.en}</td>
                 <td onClick={() => navigate('/item-details', { state: item })}>{item.price}</td>
                 <td onClick={() => navigate('/item-details', { state: item })}><img src={item.image} /></td>
-                <td><i className="fa fa-edit action-icon"></i></td>
+                <td><i className="fa fa-edit action-icon" onClick={() => navigate(`/edit-item/${index}`)}></i></td>
                 <td>
                     <i className="fa fa-trash-o action-icon" onClick={() => toggleDeleteConfirmation(index, true)}></i>
                 </td>
